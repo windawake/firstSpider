@@ -40,11 +40,17 @@ def getImgs(url,cur_page,text=''):
       for page in range(1,pageTotal+1):
         ###图片
         subUrl = url+'/'+str(page)
-        content = requests.get(subUrl,headers=headers)
+        ###使用会话 不然会导致http链接太多导致关闭
+        session = requests.session()
+        session.headers = headers
+        session.keep_alive = False
+        session.proxies = {"http":"115.159.31.195:8080"}
+        content = session.get(subUrl)
         soup = BeautifulSoup(content.text,'html.parser')
         src = soup.find('div','main-image').find('img').get('src')
         headers['Referer'] = url
-        imgcontent = requests.get(src,headers=headers)
+        session.headers = headers
+        imgcontent = session.get(src)
         array = src.split('/')
         file_name = array[len(array)-1]
         saveImg(file_name,imgcontent.content)
@@ -58,6 +64,7 @@ def Main():
   content = requests.get(url,headers=headers)
   soup = BeautifulSoup(content.text,'html.parser')
   archives = soup.find('ul','archives').find_all('a')
+  i = 0
   for archive in archives:
     #href
     href = archive.get('href')
