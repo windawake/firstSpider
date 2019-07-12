@@ -14,6 +14,6 @@ for i,v in session.instance.proxies.items():
     break
 
 if proxy:
-  print('代理成功，当前ip:{}'.format(text))
+  print('代理成功,当前ip:{}'.format(text))
 else:
   print('代理失败,当前ip:{}'.format(text))  

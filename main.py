@@ -18,10 +18,6 @@ def main():
   if  lists:
     for li in lists:
       pool.add2queue(spider.getImgs,li)
-
-    for _ in  range(config['threatNum']):
-      pool.thread.join()  
-
     pool.q.join()  
   else:
       print('抓取异常，没有数据')
