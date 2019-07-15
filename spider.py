@@ -32,7 +32,7 @@ class Spider():
           #text
           text = archive.string
           ##下载图片
-          if index > 10:
+          if index > 1:
             break
           if href:
             downList.append((href,index,text))  
@@ -50,6 +50,9 @@ class Spider():
       ## get content
       try: 
           content = self.session_instance.get(url)
+          if content.status_code !=200:
+            print('{} 获取页数失败 {}{}'.format(dirname+url,content.status_code,content))
+            return False
           soup = BeautifulSoup(content.text,'html.parser')
           ###总页数
           pageTotal = int(soup.find('div','pagenavi').find_all('a')[4].string)
@@ -57,11 +60,18 @@ class Spider():
           for page in range(1,pageTotal+1):
             ###图片
             subUrl = url+'/'+str(page)
-            content = self.session_instance.get(subUrl)            
+            content = self.session_instance.get(subUrl,timeout=5)  
+            if content.status_code !=200:
+              print('{} 获取第{}页详情失败 {}{}'.format(dirname+subUrl,page,content.status_code,content))
+              continue
+
             soup = BeautifulSoup(content.text,'html.parser')
             src = soup.find('div','main-image').find('img').get('src')
             self.session.appendHeaders({'Referer':url})
             imgcontent = self.session_instance.get(src)
+            if imgcontent.status_code !=200:
+              print('{} 获取第{}页图片大图失败 {}{}'.format(dirname+src,page,imgcontent.status_code,imgcontent.text))
+              continue
 
             array = src.split('/')
             file_name = array[len(array)-1]
